@@ -1,0 +1,357 @@
+<!DOCTYPE html>
+<html lang="ko"><head><meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover">
+<title>BEATCRAFT</title>
+<style>
+:root{color-scheme:dark;--bg:#080d1c;--pn:#121a33;--ln:#27325a;--tx:#e8ecf8;--mu:#8e97b3;--tl:#19d3c5;--gd:#f5c542;box-sizing:border-box;padding-top:env(safe-area-inset-top,0px);padding-bottom:env(safe-area-inset-bottom,0px)}
+*{box-sizing:border-box}
+html{scroll-padding-top:env(safe-area-inset-top,0px)}
+body{margin:0;background:var(--bg);color:var(--tx);font:15px/1.55 "Pretendard","Noto Sans KR",system-ui,sans-serif}
+.w{max-width:760px;margin:0 auto;padding:16px}
+section{display:none}section.on{display:block}
+h1{margin:28px 0 4px;font:800 clamp(38px,12vw,64px)/1 "Arial Black",Impact,sans-serif;letter-spacing:2px;color:var(--tl)}
+h2{margin:0 0 8px;font-size:19px}
+.tag{color:var(--gd);margin:0 0 24px}
+.mu{color:var(--mu);font-size:13px}
+button{font:inherit;color:var(--tx);background:var(--pn);border:1px solid var(--ln);border-radius:10px;padding:12px 16px;min-height:44px;cursor:pointer}
+button.p{background:var(--tl);color:#03201d;border:0;font-weight:700}
+button:focus-visible,input:focus-visible,select:focus-visible{outline:2px solid var(--gd);outline-offset:2px}
+.col{display:flex;flex-direction:column;gap:10px}
+.row{display:flex;gap:8px;flex-wrap:wrap;align-items:center;margin:10px 0}
+.top{display:flex;justify-content:space-between;align-items:center;gap:8px;margin-bottom:12px}
+.cg{display:grid;grid-template-columns:repeat(auto-fill,minmax(140px,1fr));gap:8px;margin-bottom:18px}
+.cd{border:2px solid var(--c);border-radius:10px;padding:10px;background:var(--pn)}
+.cd b{display:block}.cd small{color:var(--c)}.cd p{margin:4px 0 0;font-size:12px;color:var(--mu)}
+.cd.lk{opacity:.35;border-style:dashed}
+.st{display:flex;justify-content:space-between;align-items:center;text-align:left;width:100%}
+.st[disabled]{opacity:.35}
+.star{color:var(--gd);letter-spacing:2px}
+#ms{padding:10px 12px;border-left:4px solid var(--gd);background:var(--pn);border-radius:0 10px 10px 0}
+#ms.ok{border-color:var(--tl)}
+#grid{overflow-x:auto;padding-bottom:6px}
+.gl{display:grid;grid-template-columns:78px repeat(16,34px);gap:3px;width:max-content;align-items:center}
+.hd{text-align:center;color:var(--mu);font-size:11px}
+.lb{position:sticky;left:0;background:var(--bg);font-size:13px;z-index:1;padding-right:4px}
+.c{height:34px;min-height:0;padding:0;border-radius:6px;background:#18214a;border:0;font-weight:700;color:#03201d}
+.c.b{background:#232e5e}
+.c.x{background:var(--tl)}
+.c.lk{opacity:.18;cursor:not-allowed}
+.c.ph{outline:2px solid var(--gd);outline-offset:1px}
+input[type=range]{accent-color:var(--tl);width:130px}
+select{font:inherit;background:var(--pn);color:var(--tx);border:1px solid var(--ln);border-radius:8px;padding:8px}
+.bar{display:grid;grid-template-columns:130px 1fr 54px;gap:8px;align-items:center;margin:6px 0;font-size:13px}
+.bar i{display:block;height:10px;border-radius:5px;background:var(--tl)}
+.bar div{background:#18214a;border-radius:5px}
+.big{font:800 52px/1 "Arial Black",sans-serif;color:var(--gd)}
+button.cd{text-align:left;width:100%;min-height:0}.c.ac{box-shadow:inset 0 0 0 3px var(--gd)}button.cd:disabled{opacity:.4}
+input:not([type=range]){font:inherit;padding:12px;border-radius:8px;border:1px solid var(--ln);background:var(--pn);color:var(--tx)}
+</style></head><body><div class="w">
+
+<section id="home" class="on">
+<h1>BEATCRAFT</h1>
+<p class="tag">Build Your Rhythm. Create Your Beat.</p>
+<div id="acct" class="mu" style="margin:-12px 0 16px"></div>
+<div class="col">
+<button class="p" onclick="stages()">게임 시작</button>
+<button onclick="inf()" style="border-color:var(--gd);color:var(--gd)">INFINITE BEAT · 무한 모드</button>
+<button onclick="lbd()">리더보드</button>
+<button onclick="coll()">카드 보관함</button>
+<button onclick="reset()">설정 · 진행 초기화</button>
+</div>
+<p class="mu">카드를 모아 16칸 악보에 배치하고, 나만의 드럼 리듬을 완성하세요.</p>
+</section>
+
+<section id="col">
+<div class="top"><h2>카드 보관함</h2><button onclick="show('home')">메인</button></div>
+<div id="cards"></div>
+</section>
+
+<section id="stg">
+<div class="top"><h2>미션 선택</h2><button onclick="show('home')">메인</button></div>
+<div id="stl" class="col"></div>
+</section>
+
+<section id="ed">
+<div class="top"><h2 id="et"></h2><button onclick="leave()">나가기</button></div>
+<div id="ms"></div>
+<div class="row">
+<button class="p" id="pb" onclick="toggle()">▶ 재생</button>
+<button onclick="clr()">지우기</button>
+<button class="p" onclick="submit()">평가 받기</button>
+</div>
+<div id="grid"></div>
+<p class="mu">칸을 탭하면 음이 들어가고, 다시 탭하면 기법이 바뀝니다. 카드를 모으면 칸과 기법이 열립니다.</p>
+<div class="row" id="ctl"></div>
+</section>
+
+<section id="res">
+<div class="top"><h2 id="rt"></h2></div>
+<div class="big" id="rs"></div>
+<div class="star" id="rst"></div>
+<div id="rb"></div>
+<p id="rm"></p>
+<div id="rw"></div>
+<div class="row" id="rbt"></div>
+</section>
+<section id="inf"></section>
+<section id="iv"></section>
+<section id="lb"></section>
+
+</div>
+<script src="https://www.gstatic.com/firebasejs/10.12.2/firebase-app-compat.js"></script>
+<script src="https://www.gstatic.com/firebasejs/10.12.2/firebase-auth-compat.js"></script>
+<script src="https://www.gstatic.com/firebasejs/10.12.2/firebase-firestore-compat.js"></script>
+<script>
+const $=s=>document.querySelector(s);
+const R=['kick','snare','hat','crash','tom'],RN={kick:'Kick',snare:'Snare',hat:'Hi-hat',crash:'Crash',tom:'Floor Tom'};
+const RC={c:['Common','#8e97b3'],r:['Rare','#4a9dff'],e:['Epic','#a15cff'],l:['Legendary','#f5c542']};
+const C=[
+['kick','Kick','악기','c','베이스 드럼 소리'],['snare','Snare','악기','c','스네어 드럼 소리'],['hat','Hi-hat','악기','c','기본적인 박자 유지'],
+['crash','Crash','악기','r','강렬한 악센트'],['tom','Floor Tom','악기','r','낮고 묵직한 타격음'],
+['q4','4분음표','리듬','c','1·5·9·13칸 사용'],['q8','8분음표','리듬','c','홀수 칸(1·3·5…) 사용'],
+['q16','16분음표','리듬','r','모든 칸 사용'],['syn','싱코페이션','리듬','e','4·8·12·16칸 사용'],
+['ghost','Ghost Note','테크닉','r','작고 약한 스네어 (G)'],['flam','Flam','테크닉','e','두 번 거의 동시에 (F)'],
+['rim','Rimshot','테크닉','e','테두리와 헤드를 함께 (R)'],['drag','Drag','테크닉','l','짧은 장식음 추가 (D)'],['open','Open Hi-hat','테크닉','r','하이햇을 열어 연주 (O)'],
+['bpm','BPM','음악 요소','e','연주 속도 조절'],['groove','Groove','음악 요소','e','흔들리는 스윙 느낌'],
+['cres','Crescendo','음악 요소','l','점점 강하게'],['dim','Diminuendo','음악 요소','l','점점 약하게']
+];
+const CM=Object.fromEntries(C.map(x=>[x[0],x]));
+const cnt=(a,r)=>a.filter(x=>x[0]==r).length;
+const S=[
+['기본 리듬','Kick 4회 이상 사용',a=>cnt(a,'kick')>=4,'crash'],
+['백비트','Snare 2회 이상 사용',a=>cnt(a,'snare')>=2,'tom'],
+['일정한 박자','Hi-hat 8회 이상 사용',a=>cnt(a,'hat')>=8,'q16'],
+['빠른 연주','16분음표 포함 (짝수 칸에 음 배치)',a=>a.some(x=>x[1]%2==1),'syn'],
+['리듬 변화','싱코페이션 포함 (4·8·12·16칸에 Hi-hat 외 악기 배치)',a=>a.some(x=>x[0]!='hat'&&x[1]%4==3),'ghost'],
+['고급 테크닉','테크닉 2개 이상 사용',a=>a.filter(x=>x[2]!='n').length>=2,'open'],
+['화려한 마무리','마지막 박(13~16칸)에 Crash와 Floor Tom 사용',a=>['crash','tom'].every(r=>a.some(x=>x[0]==r&&x[1]>=12)),'rim']
+];
+let P={o:['kick','snare','hat','q4','q8'],s:{}};
+try{const j=JSON.parse(localStorage.getItem('beatcraft1'));if(j&&j.o)P=j}catch(e){}
+const save=()=>{try{localStorage.setItem(UK(),JSON.stringify(P))}catch(e){}srvPush()};
+let run=null;const O=id=>(run?run.o:P.o).includes(id);
+let cur=0,st={g:null,bpm:90,sw:0,dyn:'',playing:0,raf:0,t0:0,sd:0};
+const blank=()=>Object.fromEntries(R.map(r=>[r,Array(16).fill('')]));
+
+function show(n){stop();document.querySelectorAll('section').forEach(s=>s.classList.toggle('on',s.id==n));scrollTo(0,0)}
+function reset(){if(confirm('모든 카드와 진행 상황을 초기화할까요?')){P={o:['kick','snare','hat','q4','q8'],s:{}};save();alert('초기화했습니다.')}}
+
+function coll(){
+ let h='';
+ ['악기','리듬','테크닉','음악 요소'].forEach(t=>{
+  h+=`<h2>${t}</h2><div class="cg">`+C.filter(x=>x[2]==t).map(x=>{const own=O(x[0]);return `<div class="cd${own?'':' lk'}" style="--c:${RC[x[3]][1]}"><small>${RC[x[3]][0]}</small><b>${own?x[1]:'🔒 '+x[1]}</b><p>${x[4]}</p></div>`}).join('')+'</div>'});
+ $('#cards').innerHTML=h+`<p class="mu">보유 ${P.o.length} / ${C.length}장 · 스테이지를 클리어하면 새 카드를 얻고, 별 3개를 받으면 보너스 카드가 하나 더 나옵니다.</p>`;
+ show('col')}
+
+function stages(){
+ $('#stl').innerHTML=S.map((s,i)=>{const lock=i>0&&!P.s[i-1],n=P.s[i]||0;
+  return `<button class="st" ${lock?'disabled':''} onclick="start(${i})"><span><b>STAGE ${i+1} · ${s[0]}</b><br><span class="mu">${s[1]}</span></span><span class="star">${lock?'🔒':'★'.repeat(n)+'☆'.repeat(3-n)}</span></button>`}).join('');
+ show('stg')}
+
+function start(i){
+ cur=i;st.g=blank();st.sw=0;st.dyn='';
+ $('#et').textContent=`STAGE ${i+1} · ${S[i][0]}`;
+ const sw=O('groove')?'<label>Groove <input type="range" min="0" max="0.6" step="0.05" value="0" oninput="st.sw=+this.value"></label>':'';
+ const bp=O('bpm')?`<label>BPM <input type="range" min="60" max="140" value="90" oninput="st.bpm=+this.value;this.nextSibling.textContent=this.value"><span>90</span></label>`:'<span class="mu">90 BPM 고정 (BPM 카드로 조절)</span>';
+ const dy=(O('cres')||O('dim'))?`<select onchange="st.dyn=this.value"><option value="">강약 없음</option>${O('cres')?'<option value="cres">Crescendo</option>':''}${O('dim')?'<option value="dim">Diminuendo</option>':''}</select>`:'';
+ st.bpm=90;st.tm=0;st.am=0;st.t=blank12();st.acc=new Set();$('#ctl').innerHTML=bp+sw+dy+(O('t3')?'<button id="tmb" onclick="tmode()">격자: 16분</button>':'')+(O('accent')?'<button id="acb" onclick="am()">Accent 모드: 꺼짐</button>':'');
+ draw();show('ed')}
+
+const al=i=>O('q16')||(O('q4')&&i%4==0)||(O('q8')&&i%2==0)||(O('syn')&&i%4==3);
+function vars(r){const a=['n'];if(r=='snare'){O('ghost')&&a.push('g');O('flam')&&a.push('f');O('rim')&&a.push('r');O('drag')&&a.push('d')}if(r=='hat'&&O('open'))a.push('o');return a}
+function notes(){const a=[];R.forEach(r=>{st.g[r].forEach((v,i)=>v&&a.push([r,i,v]));st.t[r].forEach((v,j)=>v&&a.push([r,j*4/3,v,1]))});return a}
+function draw(){
+ const N=st.tm?12:16,G=st.tm?st.t:st.g;let h=`<div class="gl" style="grid-template-columns:78px repeat(${N},34px)"><span></span>`+[...Array(N)].map((_,i)=>`<small class="hd">${i+1}</small>`).join('');
+ R.forEach(r=>{h+=`<b class="lb">${O(r)?'':'🔒'}${RN[r]}</b>`;
+  for(let i=0;i<N;i++){const v=G[r][i],ok=O(r)&&(st.tm||al(i));h+=`<button class="c${i%(st.tm?3:4)?'':' b'}${v?' x':''}${st.acc.has(r+(st.tm?'t':'g')+i)?' ac':''}${ok?'':' lk'}" data-i="${i}" data-r="${r}" aria-label="${RN[r]} ${i+1}칸">${v?(v=='n'?'●':v.toUpperCase()):''}</button>`}});
+ $('#grid').innerHTML=h+'</div>';chk()}
+function chk(){if(run)return ichk();const ok=S[cur][2](notes());const m=$('#ms');m.className=ok?'ok':'';m.textContent=(ok?'✔ 미션 달성: ':'○ 미션: ')+S[cur][1]}
+$('#grid').addEventListener('click',e=>{
+ const b=e.target.closest('.c');if(!b)return;
+ const r=b.dataset.r,i=+b.dataset.i;if(!O(r)||!(st.tm||al(i)))return;const G=st.tm?st.t:st.g,ak=r+(st.tm?'t':'g')+i;if(st.am){if(G[r][i]){st.acc.has(ak)?st.acc.delete(ak):st.acc.add(ak);draw()}return}
+ const a=vars(r),c=G[r][i],k=c?a.indexOf(c):-1,nx=k+1<a.length?a[k+1]:'';
+ G[r][i]=nx;if(!nx)st.acc.delete(ak);if(nx){const c0=ac();hit(c0,c0.currentTime,r,nx,1)}
+ draw()});
+function clr(){stop();st.g=blank();st.t=blank12();st.acc=new Set();draw()}
+
+/* audio */
+let A,M,NB;
+function ac(){if(!A){A=new(window.AudioContext||window.webkitAudioContext)();M=A.createGain();M.connect(A.destination);NB=A.createBuffer(1,A.sampleRate*1.5,A.sampleRate);const d=NB.getChannelData(0);for(let i=0;i<d.length;i++)d[i]=Math.random()*2-1}if(A.state=='suspended')A.resume();return A}
+function hit(c,t,r,v,g){
+ const env=(n,a,d)=>{n.gain.setValueAtTime(Math.max(a*g,.001),t);n.gain.exponentialRampToValueAtTime(.001,t+d)};
+ const tone=(f1,f2,d,a)=>{const s=c.createOscillator(),n=c.createGain();s.frequency.setValueAtTime(f1,t);s.frequency.exponentialRampToValueAtTime(f2,t+d);env(n,a,d);s.connect(n).connect(M);s.start(t);s.stop(t+d+.02)};
+ const noise=(d,a,f,ty)=>{const s=c.createBufferSource(),fl=c.createBiquadFilter(),n=c.createGain();s.buffer=NB;fl.type=ty;fl.frequency.value=f;env(n,a,d);s.connect(fl).connect(n).connect(M);s.start(t,Math.random()*.2,d+.05)};
+ if(r=='kick')tone(150,42,.32,1);
+ else if(r=='tom')tone(115,48,.45,.9);
+ else if(r=='hat')noise(v=='o'?.4:.07,.35,7000,'highpass');
+ else if(r=='crash')noise(1.2,.45,5000,'highpass');
+ else{
+  const snare=(tt,gg,q)=>{const a=v=='g'?.22:v=='r'?1.1:.7;const s0=t;t=tt;const g0=g;g=g0*gg;noise(.16,a,v=='r'?3200:1800,'bandpass');tone(230,130,.1,a*.6);t=s0;g=g0};
+  if(v=='f'){snare(t-.03,.5)}else if(v=='d'){snare(t-.07,.4);snare(t-.035,.5)}
+  snare(t,1)}
+}
+function stop(){st.playing=0;cancelAnimationFrame(st.raf);document.querySelectorAll('.ph').forEach(e=>e.classList.remove('ph'));if(A){M.disconnect();M=A.createGain();M.connect(A.destination)}const b=$('#pb');if(b)b.textContent='▶ 재생'}
+function toggle(){if(st.playing){stop();return}play()}
+function play(){
+ const c=ac();stop();
+ const sd=60/st.bpm/4,t0=c.currentTime+.12;st.t0=t0;st.sd=sd;
+ for(let k=0;k<32;k++){const i=k%16,t=t0+k*sd+(i%2?st.sw*sd:0);let g=1;
+  if(st.dyn=='cres')g=.35+.65*k/31;if(st.dyn=='dim')g=1-.65*k/31;
+  R.forEach(r=>{const v=st.g[r][i];if(v)hit(c,Math.max(t,c.currentTime),r,v,g*(st.acc.has(r+'g'+i)?1.4:1))})}
+ for(let k=0;k<24;k++){const j=k%12,t=t0+k*sd*4/3;let g=1;if(st.dyn=='cres')g=.35+.65*k/23;if(st.dyn=='dim')g=1-.65*k/23;R.forEach(r=>{const v=st.t[r][j];if(v)hit(c,Math.max(t,c.currentTime),r,v,g*(st.acc.has(r+'t'+j)?1.4:1))})}
+ st.playing=1;$('#pb').textContent='■ 정지';tick()}
+function tick(){
+ if(!st.playing)return;
+ const s=Math.floor((A.currentTime-st.t0)/st.sd);
+ if(s>=32){stop();return}
+ document.querySelectorAll('.ph').forEach(e=>e.classList.remove('ph'));
+ if(s>=0)document.querySelectorAll('#grid [data-i="'+(st.tm?Math.floor(s%16*3/4):s%16)+'"]').forEach(e=>e.classList.add('ph'));
+ st.raf=requestAnimationFrame(tick)}
+
+/* score */
+function score(a){
+ const hat=cnt(a,'hat'),g=st.g;
+ const hs=g.hat.map((v,i)=>v?i:-1).filter(i=>i>=0),steady=hs.length>=8&&(hs.every(i=>i%2==0)||hs.length>=14),clean=cnt(a,'kick')>0&&g.kick.every((v,i)=>!(v&&g.snare[i]));
+ const t=(g.kick[0]?5:0)+(g.kick[8]?3:0)+(g.snare[4]?4:0)+(g.snare[12]?4:0)+(steady?5:Math.min(4,hs.length/2))+(clean?4:0);
+ const a16=a.filter(x=>!x[3]),v=Math.min(20,new Set(a16.map(x=>x[1]%4)).size*3+(a16.some(x=>x[0]!='hat'&&x[1]%4==3)?4:0)+(a.some(x=>x[3])?4:0));
+ const ins=R.reduce((s,r)=>{const c=cnt(a,r),m={kick:3,snare:3,hat:8,crash:2,tom:2}[r];return s+(c?2:0)+(c>=m?2:0)},0);
+ const tv=a.filter(x=>x[2]!='n'),tc=Math.min(20,new Set(tv.map(x=>x[2])).size*5+(tv.length>=4?5:0));
+ const n=a.length,mu=(n>=12&&n<=32?5:n>=8?2:0)+(a.some(x=>(x[0]=='crash'||x[0]=='tom')&&x[1]>=12)?3:0)+(cnt(a,'kick')>=3?2:0)+(a.filter(x=>x[1]>=8).length>=3?3:0)+(st.acc.size>=2||st.dyn?2:0);
+ return [['Timing Accuracy',t,25],['Rhythm Variety',v,20],['Instrument Use',ins,20],['Technique',tc,20],['Musical Completeness',mu,15]].map(x=>[x[0],Math.round(x[1]),x[2]])}
+
+function submit(){if(run)return rsub();
+ stop();const a=notes(),sc=score(a),base=sc.reduce((s,x)=>s+x[1],0),ok=S[cur][2](a),tot=Math.min(100,base+(ok?5:0));
+ const stars=ok?(tot>=90?3:tot>=70?2:1):0,got=[];
+ if(ok){
+  if(stars>(P.s[cur]||0))P.s[cur]=stars;
+  const rw=S[cur][3];if(!O(rw)){P.o.push(rw);got.push(rw)}
+  if(stars==3){const l=C.map(x=>x[0]).filter(x=>!O(x));if(l.length){const x=l[Math.random()*l.length|0];P.o.push(x);got.push(x)}}
+  save()}
+ $('#rt').textContent=`STAGE ${cur+1} · ${S[cur][0]}`;
+ $('#rs').textContent=tot+'점';
+ $('#rst').textContent=ok?'★'.repeat(stars)+'☆'.repeat(3-stars):'미션 실패';
+ $('#rb').innerHTML=sc.map(x=>`<div class="bar"><span>${x[0]}</span><div><i style="width:${x[1]/x[2]*100}%"></i></div><span>${x[1]}/${x[2]}</span></div>`).join('');
+ $('#rm').textContent=ok?'미션 달성! 추가 점수 +5':'미션 미달성: '+S[cur][1];
+ $('#rw').innerHTML=got.length?'<h2>새 카드 획득</h2><div class="cg">'+got.map(id=>{const x=CM[id];return `<div class="cd" style="--c:${RC[x[3]][1]}"><small>${RC[x[3]][0]}</small><b>${x[1]}</b><p>${x[4]}</p></div>`}).join('')+'</div>':'';
+ $('#rbt').innerHTML=(ok&&cur<S.length-1?`<button class="p" onclick="start(${cur+1})">다음 스테이지</button>`:'')+`<button onclick="start(${cur})">다시 도전</button><button onclick="stages()">미션 선택</button><button onclick="show('home')">메인</button>`;
+ show('res')}
+/* INFINITE BEAT */
+const RK=()=>P.rec||(P.rec={r:0,s:0,c:0,b:0,t:0});
+const PRI=['crash','tom','q16','syn','ghost','open','flam','rim','groove','bpm','drag','cres','dim'],TQ=['ghost','flam','rim','drag','open'],PR={c:20,r:40,e:70,l:120};
+const sum=s=>s.reduce((t,x)=>t+x[1],0),rnd=l=>l.slice().sort(()=>Math.random()-.5);
+const used=(id,a)=>({q4:a.some(x=>x[1]%4==0),q8:a.some(x=>x[1]%2==0),q16:a.some(x=>x[1]%2==1),t3:a.some(x=>x[3]),accent:st.acc.size>0,syn:a.some(x=>x[1]%4==3),ghost:a.some(x=>x[2]=='g'),flam:a.some(x=>x[2]=='f'),rim:a.some(x=>x[2]=='r'),drag:a.some(x=>x[2]=='d'),open:a.some(x=>x[2]=='o'),groove:st.sw>0,bpm:st.bpm!=90,cres:st.dyn=='cres',dim:st.dyn=='dim'})[id]??cnt(a,id)>0;
+const calc=a=>sum(score(a))+Object.entries(run.lv).reduce((s,[k,l])=>s+(used(k,a)?l*2:0),0);
+const cc=(id,fn,pr)=>{const c=CM[id];return `<button class="cd" style="--c:${RC[c[3]][1]}" ${pr>run.coin?'disabled':''} onclick="${fn}('${id}')"><small>${RC[c[3]][0]}</small><b>${c[1]}${run.lv[id]?' Lv'+run.lv[id]:''}${pr?' · 🪙'+pr:''}</b><p>${c[4]}</p></button>`};
+function inf(){
+ const r=RK(),t=r.t;
+ $('#inf').innerHTML=`<div class="top"><h2>INFINITE BEAT</h2><button onclick="show('home')">메인</button></div><p>라운드마다 새 미션이 나옵니다. 클리어하면 카드 3장 중 1장을 고르고, 하트 3개를 모두 잃으면 끝납니다. 10라운드마다 보스가 등장합니다.</p><div class="cd" style="--c:var(--gd)"><b>최고 기록</b><p>최고 라운드 ${r.r} · 최고 점수 ${r.s} · 최고 콤보 ${r.c}<br>보스 클리어 ${r.b} · 최장 생존 ${t/60|0}분 ${t%60}초</p></div><div class="row"><button class="p" onclick="runStart()">도전 시작</button></div>`;show('inf')}
+function runStart(){run={o:['kick','snare','hat','q4','q8'],lv:{},r:0,h:3,coin:0,sc:0,cb:0,bc:0,bb:0,clr:0,t0:Date.now(),ev:'',m:[],boss:'',tg:0,shop:null};nr()}
+function nr(){run.shop=null;run.r++;genM();begin()}
+function begin(){cur=0;start(0);$('#et').textContent=`ROUND ${run.r}  ${'♥'.repeat(run.h)}  🪙${run.coin}`+(run.ev?'  '+run.ev:'')}
+function leave(){if(run){if(confirm('도전을 포기하면 지금까지의 기록으로 끝납니다. 포기할까요?'))fin()}else stages()}
+function genM(){
+ const r=run.r,o=id=>run.o.includes(id),M=[],ev=run.ev;
+ const bl=Math.min(3,r/10|0),q=o('q16'),nk=4+Math.min(q?6:1,r/5|0),ns=2+Math.min(q?3:1,r/6|0),nh=8+(q?Math.min(4,r/8|0):0),sy=1+Math.min(4,r/10|0),tc=2+Math.min(4,r/8|0),na=2+Math.min(3,r/12|0),n3=3+Math.min(5,r/10|0),nt=Math.min(23,16+(r/5|0)),nd=Math.min(34,12+r,Math.floor(R.filter(o).length*(q?16:8)*.6));
+ const sn=a=>a.filter(x=>x[0]!='hat'&&x[1]%4==3).length,tn=a=>a.filter(x=>x[2]!='n').length,tq=TQ.some(o);
+ const A={kick:[`Kick ${nk}회 이상`,a=>cnt(a,'kick')>=nk,1],snare:[`Snare ${ns}회 이상`,a=>cnt(a,'snare')>=ns,1],hat:[`Hi-hat ${nh}회 이상`,a=>cnt(a,'hat')>=nh,1],crash:['Crash 사용',a=>cnt(a,'crash')>0,o('crash')],tom:['Floor Tom 사용',a=>cnt(a,'tom')>0,o('tom')],q16:['16분음표 사용',a=>a.some(x=>x[1]%2==1),r>4&&o('q16')],syn:[`싱코페이션 ${sy}회 이상`,a=>sn(a)>=sy,r>7&&(o('q16')||o('syn'))],tech:[`테크닉 ${tc}개 이상`,a=>tn(a)>=tc,r>7&&tq],t3:[`셋잇단음표 ${n3}회 이상`,a=>a.filter(x=>x[3]).length>=n3,r>7&&o('t3')],acc:[`Accent ${na}회 이상`,()=>st.acc.size>=na,r>7&&o('accent')],dens:[`음 ${nd}개 이상 사용`,a=>a.length>=nd,r>3],clean:['Kick·Snare 같은 칸 금지',a=>!a.some(x=>x[0]=='kick'&&a.some(y=>y[0]=='snare'&&y[1]==x[1])),r>3],back:['Snare를 5·13번째 칸에',a=>[4,12].every(p=>a.some(x=>x[0]=='snare'&&x[1]==p)),r>2],ins4:['악기 4종 이상 사용',a=>new Set(a.map(x=>x[0])).size>=4,r>5&&(o('crash')||o('tom'))],tim:[`Timing ${nt}/25점 이상`,a=>score(a)[0][1]>=nt,r>6]};
+ const B=[['THE KEEPER',[['Timing Accuracy 96% 이상',a=>score(a)[0][1]>=24],A.kick],1],['THE SPEEDER',[[`16분음표 ${6+bl*2}회 이상`,a=>a.filter(x=>x[1]%2==1).length>=6+bl*2],A.hat],o('q16')],['THE GROOVER',[[`싱코페이션 ${2+bl}회 이상`,a=>sn(a)>=2+bl],['셔플(Groove) 0.2 이상',()=>st.sw>=.2]],o('groove')&&(o('q16')||o('syn'))],['THE MASTER',[['모든 악기 사용',a=>new Set(a.map(x=>x[0])).size==5],[`테크닉 ${3+bl}개 이상`,a=>tn(a)>=3+bl]],o('crash')&&o('tom')&&tq]];
+ let tg=Math.min(90,44+(r*3|0)),boss='';
+ if(r%10==0){let b=B[(r/10-1)%4];if(!b[2])b=B[0];boss=b[0];b[1].forEach(x=>M.push(x));tg+=6}
+ else{const ids=Object.keys(A).filter(k=>A[k][2]);(r==1?['kick','snare','hat']:rnd(ids).slice(0,3+(r>8)+(r>18)+(r>30)+(ev=='CHALLENGE'?1:0))).forEach(k=>M.push(A[k]))}
+ if(ev=='BONUS')tg-=10;
+ run.tg=tg;run.boss=boss;M.push([`${tg}점 이상`,a=>calc(a)>=tg]);run.m=M}
+function ichk(){const a=notes(),l=run.m.map(x=>[x[0],x[1](a)]),m=$('#ms');m.className=l.every(x=>x[1])?'ok':'';m.innerHTML=(run.boss?`<b>BOSS · ${run.boss}</b><br>`:'')+(run.ev?`<b>${run.ev}</b><br>`:'')+l.map(x=>(x[1]?'✓ ':'✗ ')+x[0]).join('<br>')}
+function offers(){const un=C.map(x=>x[0]).filter(x=>!run.o.includes(x));let p=run.boss?un.filter(x=>CM[x][3]!='c'):un;if(p.length<3)p=un;const f=PRI.find(x=>p.includes(x));return(f?[f]:[]).concat(rnd(p.filter(x=>x!=f))).slice(0,3)}
+function rsub(){
+ stop();const a=notes(),sc=score(a),tot=calc(a),ok=run.m.every(x=>x[1](a)),b=tot-sum(sc);
+ let h=`<div class="top"><h2>ROUND ${run.r}${run.boss?' · '+run.boss:''}</h2></div><div class="big">${tot}점</div>`+sc.map(x=>`<div class="bar"><span>${x[0]}</span><div><i style="width:${x[1]/x[2]*100}%"></i></div><span>${x[1]}/${x[2]}</span></div>`).join('')+(b?`<p class="mu">카드 강화 보너스 +${b}</p>`:'')+`<p>${run.m.map(x=>(x[1](a)?'✓ ':'✗ ')+x[0]).join('<br>')}</p>`;
+ if(ok){
+  const bn=run.ev=='BONUS'?2:1,g=10+run.r+(run.boss?50:0)+(run.ev=='CHALLENGE'?60:0);
+  run.cb++;run.bc=Math.max(run.bc,run.cb);run.clr++;run.sc+=tot*bn;run.coin+=g;if(run.boss)run.bb++;
+  const of=offers();
+  h+=`<p><b>CLEAR!</b> 코인 +${g}${bn>1?' · 점수 ×2':''}</p>`+(of.length?`<h2>카드 선택</h2><div class="cg">${of.map(id=>cc(id,'pick')).join('')}</div>`:'')+`<div class="row"><button onclick="after()">${of.length?'건너뛰기':'다음'}</button></div>`;
+ }else{
+  run.cb=0;run.h--;
+  if(run.h<=0)return fin(h+'<p><b>FAIL</b> 마지막 하트를 잃었습니다.</p>');
+  h+=`<p><b>FAIL</b> 하트 -1 (♥ ${run.h})</p><div class="row"><button class="p" onclick="begin()">같은 미션 다시 도전</button><button onclick="leave()">포기</button></div>`}
+ $('#iv').innerHTML=h;show('iv')}
+function pick(id){run.o.push(id);after()}
+function after(){
+ run.ev='';
+ if((run.r+1)%10&&Math.random()<.18){const e=['BONUS','CARD SHOP','CARD UPGRADE','CHALLENGE','REST'][Math.random()*5|0];if(e=='BONUS'||e=='CHALLENGE')run.ev=e;evs(e)}
+ else nr()}
+function evs(e){
+ let h=`<div class="top"><h2>${e}</h2></div>`;
+ const nx=t=>`<div class="row"><button class="p" onclick="nr()">${t}</button></div>`;
+ if(e=='BONUS')h+='<p>목표 점수가 10점 낮아지고, 이번 점수는 2배로 누적됩니다.</p>'+nx('시작');
+ else if(e=='CHALLENGE')h+='<p>조건이 하나 더 붙습니다. 클리어하면 코인 +60.</p>'+nx('시작');
+ else if(e=='REST'){run.h=Math.min(5,run.h+1);h+=`<p>잠시 쉬어갑니다. 하트 +1 (♥ ${run.h})</p>`+nx('다음 라운드')}
+ else if(e=='CARD SHOP'){
+  if(!run.shop)run.shop=rnd(C.map(x=>x[0]).filter(x=>!run.o.includes(x))).slice(0,3);
+  h+=`<p>🪙 ${run.coin}</p><div class="cg">${run.shop.map(id=>cc(id,'buy',PR[CM[id][3]])).join('')}</div>`+nx('나가기')}
+ else h+='<p>강화할 카드를 고르세요. 강화한 카드를 쓰면 라운드 점수가 Lv당 +2점 오릅니다.</p><div class="cg">'+run.o.map(id=>cc(id,'up')).join('')+'</div>';
+ $('#iv').innerHTML=h;show('iv')}
+function buy(id){run.coin-=PR[CM[id][3]];run.o.push(id);run.shop=run.shop.filter(x=>x!=id);evs('CARD SHOP')}
+function up(id){run.lv[id]=(run.lv[id]||0)+1;nr()}
+function fin(pre){
+ stop();const r=RK(),t=Math.round((Date.now()-run.t0)/1000),n={r:run.clr,s:run.sc,c:run.bc,b:run.bb,t:t},nw=Object.keys(n).filter(k=>n[k]>r[k]);
+ nw.forEach(k=>r[k]=n[k]);save();
+ $('#iv').innerHTML=(pre||'')+`<h2>GAME OVER</h2><p>클리어 ${n.r}라운드 · 누적 ${n.s}점 · 최고 콤보 ${n.c} · 보스 ${n.b} · ${t/60|0}분 ${t%60}초</p>${nw.length?'<p class="star">신기록 달성!</p>':''}<div class="row"><button class="p" onclick="runStart()">다시 도전</button><button onclick="inf()">기록 보기</button><button onclick="show('home')">메인</button></div>`;
+ run=null;show('iv')}
+/* 셋잇단음표 · Accent */
+const blank12=()=>Object.fromEntries(R.map(r=>[r,Array(12).fill('')]));
+C.push(['t3','셋잇단음표','리듬','e','한 박자를 셋으로 나눈 12칸 격자'],['accent','Accent','음악 요소','r','강조할 음을 골라 세게 연주']);
+C.forEach(x=>CM[x[0]]=x);
+PRI.splice(4,0,'t3','accent');
+S[6][3]='t3';
+S.push(['셋잇단 리듬','셋잇단음표 3회 이상 사용 (셋잇단 격자에서 배치)',a=>a.filter(x=>x[3]).length>=3,'accent'],['강약 표현','Accent 2회 이상 사용 (Accent 모드에서 음을 탭)',()=>st.acc.size>=2,'rim']);
+function tmode(){st.tm=st.tm?0:1;$('#tmb').textContent='격자: '+(st.tm?'셋잇단 (12칸)':'16분');draw()}
+function am(){st.am=!st.am;$('#acb').textContent='Accent 모드: '+(st.am?'켜짐 (음을 탭)':'꺼짐')}
+/* 계정 (Firebase) · 리더보드 */
+// ▼▼ Firebase 콘솔 > 프로젝트 설정 > 내 앱(웹)의 설정 값을 여기에 붙여넣으세요 (README 4번) ▼▼
+const FIREBASE_CONFIG={apiKey:'AIzaSyDZYdPPVktlHcq4gqa7alLm9RdPHJxtwVI',authDomain:'beat-craft-acf5d.firebaseapp.com',projectId:'beat-craft-acf5d',appId:'1:775081794250:web:b6dd2aa9827f4949087233'};
+// ▲▲
+let ME=null,U=null,GP=null,FA=null,FS=null,lbm='r',spT=0;
+const esc=s=>String(s).replace(/[&<>"]/g,c=>({'&':'&amp;','<':'&lt;','>':'&gt;','"':'&quot;'}[c]));
+const UK=()=>ME?'bc_u_'+ME:'beatcraft1',dflt=()=>({o:['kick','snare','hat','q4','q8'],s:{}});
+const loadP=n=>{let p=null;try{p=JSON.parse(localStorage.getItem(n?'bc_u_'+n:'beatcraft1'))}catch(e){}return p&&p.o?p:dflt()};
+const NET='서버에 연결할 수 없습니다. 게스트 모드로는 계속 즐길 수 있어요.';
+const NOCFG='Firebase 설정이 아직 되어 있지 않습니다 (README 참고). 지금은 게스트 모드로만 쓸 수 있어요.';
+const BAD='아이디 또는 비밀번호가 맞지 않습니다.';
+const ERR={'auth/email-already-in-use':'이미 사용 중인 아이디입니다.','auth/invalid-credential':BAD,'auth/invalid-login-credentials':BAD,'auth/wrong-password':BAD,'auth/user-not-found':BAD,'auth/weak-password':'비밀번호는 6자 이상이어야 합니다.','auth/too-many-requests':'시도가 너무 많습니다. 잠시 후 다시 해 주세요.','auth/network-request-failed':NET,'auth/operation-not-allowed':'Firebase 콘솔에서 이메일/비밀번호 로그인을 켜야 합니다.'};
+try{if(window.firebase&&FIREBASE_CONFIG.apiKey){firebase.initializeApp(FIREBASE_CONFIG);FA=firebase.auth();FS=firebase.firestore()}}catch(e){FA=FS=null}
+const mail=id=>id+'@beatcraft.app';
+function acct(){const e=$('#acct'),b='style="min-height:0;padding:4px 10px;font-size:12px"';if(e)e.innerHTML=ME?`👤 <b>${esc(ME)}</b> · 계정에 저장됨 <button onclick="out()" ${b}>로그아웃</button>`:`게스트 모드 · <button onclick="lgn()" ${b}>로그인 / 가입</button>`}
+function lgn(msg){
+ $('#lb').innerHTML=`<div class="top"><h2>로그인 / 가입</h2><button onclick="show('home')">메인</button></div><p class="mu">아이디와 비밀번호로 로그인하면 카드와 진행 상황이 계정에 저장되어 어느 기기에서든 이어 할 수 있고, 리더보드에 기록이 올라갑니다. 가입하면 지금 게스트 진행 상황(카드·별)이 계정으로 옮겨집니다. 비밀번호 찾기는 지원하지 않습니다.</p><div class="col"><input id="un" maxlength="12" placeholder="아이디 (영문 소문자·숫자·_ 3~12자)" autocomplete="username" autocapitalize="none"><input id="pw" type="password" maxlength="64" placeholder="비밀번호 (6자 이상)" autocomplete="current-password"><div class="row"><button class="p" onclick="auth('login')">로그인</button><button onclick="auth('signup')">새로 가입</button></div><p id="lm" class="mu">${msg||''}</p></div>`;show('lb')}
+async function auth(k){
+ const id=$('#un').value.trim().toLowerCase(),pw=$('#pw').value,lm=$('#lm');
+ if(!FA)return lm.textContent=NOCFG;
+ if(!/^[a-z0-9_]{3,12}$/.test(id)||pw.length<6)return lm.textContent='아이디는 영문 소문자·숫자·_ 3~12자, 비밀번호는 6자 이상이어야 합니다.';
+ lm.textContent='처리 중…';
+ try{if(k=='signup'){GP={o:P.o,s:P.s};await FA.createUserWithEmailAndPassword(mail(id),pw)}else await FA.signInWithEmailAndPassword(mail(id),pw);show('home')}
+ catch(e){GP=null;lm.textContent=ERR[e.code]||('오류가 발생했습니다 ('+(e.code||e.message)+')')}}
+function out(){if(FA)FA.signOut();U=ME=null;P=loadP(null);acct();show('home')}
+async function pull(){
+ const u=U;
+ try{const d=await FS.doc('saves/'+u.uid).get();
+  P=d.exists?d.data():(GP?{o:GP.o,s:GP.s}:dflt());
+  if(!P.o)P=dflt();RK()}catch(e){console.warn(e)}
+ GP=null;save();acct()}
+function srvPush(){if(!U)return;clearTimeout(spT);spT=setTimeout(pushNow,1200)}
+async function pushNow(){
+ if(!U)return;const r=RK();
+ try{await FS.doc('saves/'+U.uid).set({o:P.o,s:P.s,rec:r});await FS.doc('board/'+U.uid).set({name:ME,r:r.r|0,s:r.s|0,c:r.c|0,b:r.b|0})}catch(e){console.warn(e)}}
+async function lbd(m){
+ if(m)lbm=m;
+ const T={r:'최고 라운드',s:'최고 점수',c:'최고 콤보',b:'보스 클리어'};
+ $('#lb').innerHTML=`<div class="top"><h2>리더보드</h2><button onclick="show('home')">메인</button></div><div class="row">${Object.keys(T).map(k=>`<button class="${k==lbm?'p':''}" onclick="lbd('${k}')">${T[k]}</button>`).join('')}</div><div id="lbl" class="mu">불러오는 중…</div>`;show('lb');
+ if(!FS){$('#lbl').textContent=NOCFG;return}
+ try{
+  if(U){clearTimeout(spT);await pushNow()}
+  const s=await FS.collection('board').orderBy(lbm,'desc').limit(20).get(),L=s.docs.map(d=>d.data()).filter(x=>x[lbm]>0);
+  $('#lbl').innerHTML=(L.length?L.map((x,i)=>`<div class="bar" style="grid-template-columns:34px 1fr auto${x.name==ME?';color:var(--gd)':''}"><b>${i+1}</b><span>${esc(x.name)}</span><b>${x[lbm]}</b></div>`).join(''):'아직 기록이 없습니다. 무한 모드에 도전해 보세요!')+(U?'':'<div class="row"><button class="p" onclick="lgn()">로그인 / 가입</button></div>')}
+ catch(e){console.warn(e);$('#lbl').textContent=NET}}
+if(FA)FA.onAuthStateChanged(u=>{if(u){U=u;ME=(u.email||'').split('@')[0];P=loadP(ME);acct();pull()}else{U=null;ME=null;acct()}});
+acct();
+</script></body></html>
